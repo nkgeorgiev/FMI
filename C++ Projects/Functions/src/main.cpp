@@ -21,11 +21,7 @@ void testFunctionOrder(){
 }
 
 int main() {
-	//testFunctionOrder();
-	string func = "void foo(int a, int b){int b; cout<<a+b<<endl;";
-	vector<string> s = multi_split(func, "{;}");
-	for(int i = 0; i < s.size(); i++){
-		cout<<s[i]<<endl;
-	}
+	testFunctionOrder();
+
 	return 0;
 }

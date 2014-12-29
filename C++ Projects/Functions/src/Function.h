@@ -18,7 +18,6 @@
 using namespace std;
 
 vector<string> split(string s, string delim);
-vector<string> multi_split(string s, string delim);
 
 
 class Function {
@@ -53,7 +52,7 @@ public:
 		return ret_type;
 	}
 
-	void prettyPrint()const;
+	void prettyPrint(ostream &)const;
 };
 
 #endif /* FUNCTION_H_ */

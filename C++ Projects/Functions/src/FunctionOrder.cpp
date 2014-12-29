@@ -30,7 +30,7 @@ string FunctionOrder::getFunctionText(string t) {
 			}
 		}
 	}
-	cout<<t.substr(0,s+1)<<endl;
+	//cout<<t.substr(0,s+1)<<endl;
 	return t.substr(0,s+1);
 }
 
@@ -39,7 +39,7 @@ void FunctionOrder::loadFile(string filename) {
 	string line;
 	while (!ifs.eof()) {
 		getline(ifs, line);
-		//cout<<line<<endl;
+		int i = 0;
 		if (line[0] != '#' && line.find("using") == string::npos) {
 			int idx = line.find("//");
 			if (idx == string::npos)
@@ -117,17 +117,19 @@ FunctionOrder::FunctionOrder(string filename) {
 	loadFile(filename);
 	string t = getFunctionText(text);
 	while(!t.empty()){
-		functions.push_back(new Function(t));
+		Function* f =  new Function(t);
+		f->prettyPrint(cout);
+		functions[f->getName()] = shared_ptr<Function>(f);
 		t = getFunctionText(text.substr(text.find(t)+t.size()));
 	}
 
 }
 
 FunctionOrder::~FunctionOrder(){
-	while(!functions.empty()){
-		Function* tmp = functions.back();
-		delete tmp;
-		functions.pop_back();
-	}
+//	while(!functions.empty()){
+//		Function* tmp = functions.back();
+//		delete tmp;
+//		functions.pop_back();
+//	}
 
 }

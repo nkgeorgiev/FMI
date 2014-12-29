@@ -16,7 +16,7 @@
 
 
 class FunctionOrder {
-	vector<Function*> functions;
+	map<string, shared_ptr<Function> > functions;
 	string text;
 	//vector<string> contents;
 
