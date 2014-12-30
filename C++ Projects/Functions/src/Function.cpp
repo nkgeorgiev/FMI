@@ -39,16 +39,17 @@ void Function::readFunction(string text) {
 	while (first[start_idx--] != ' ')
 		;
 	this->name = first.substr(start_idx + 2, end_idx - start_idx);
-	this->ret_type = first.substr(0, start_idx + 1);
-
-	start_idx = first.size() + 2;
-	end_idx = second.size() - 1;
-	vector<string> arg = split(second, ",");
-	for (int i = 0; i < arg.size(); i++) {
-		vector<string> v = split(arg[i], " ");
-		args_type.push_back(v[0]);
-		args.push_back(v[1]);
-	}
+	this->declaration = text.substr(0, second_bracket+1);
+//	this->ret_type = first.substr(0, start_idx + 1);
+//
+//	start_idx = first.size() + 2;
+//	end_idx = second.size() - 1;
+//	vector<string> arg = split(second, ",");
+//	for (int i = 0; i < arg.size(); i++) {
+//		vector<string> v = split(arg[i], " ");
+//		args_type.push_back(v[0]);
+//		args.push_back(v[1]);
+//	}
 
 }
 

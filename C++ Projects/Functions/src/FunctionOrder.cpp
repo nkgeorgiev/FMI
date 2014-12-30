@@ -39,6 +39,7 @@ void FunctionOrder::loadFile(string filename) {
 	string line;
 	while (!ifs.eof()) {
 		getline(ifs, line);
+		file.push_back(line);
 		int i = 0;
 		if (line[0] != '#' && line.find("using") == string::npos) {
 			int idx = line.find("//");
@@ -118,15 +119,57 @@ FunctionOrder::FunctionOrder(string filename) {
 	string t = getFunctionText(text);
 	int i = 0;
 	while(!t.empty()){
-		shared_ptr<Function>  f = shared_ptr<Function>(new Function(t));
+		func_ptr  f = func_ptr(new Function(t));
 		//f->prettyPrint(cout);
-		functions[f->getName()] = f;
-		mapping[i++] = f;
+		string key = f->getName();
+		functions[key] = f;
 		t = getFunctionText(text.substr(text.find(t)+t.size()));
 	}
 	functions["foo"]->prettyPrint(cout);
+	map<string, func_ptr>::iterator it = functions.begin();
+	for(;it != functions.end(); it++){
+		//it->second->prettyPrint(cout);
+		vector<func_ptr> func_calls = findFunctionCalls(it->second);
+		for(int i = 0; i < func_calls.size(); i++){
+			g.add_edge(it->second, func_calls[i]);
+		}
+	}
 }
 
+vector<func_ptr> FunctionOrder::findFunctionCalls(func_ptr f){
+	vector<func_ptr> functionCalls;
+	string text = f->getContents();
+	text = text.substr(text.find("{")+1);
+	int idx1, idx2;
+	idx1 = text.find('(');
+	idx2 = text.find(')');
+	while(idx1 != string::npos && idx2 != string::npos){
+		while(text[--idx1] == ' ');
+		string name = text.substr(0,idx1+1);
+
+		name = name.substr(name.find_last_of(" ;}")+1);
+		//cout<<name<<endl;
+		text = text.substr(idx2+1);
+		idx1 = text.find('(');
+		idx2 = text.find(')');
+		//cout<<name<<endl;
+
+		if(functions.find(name) != functions.end())
+		{
+			cout<<name<<endl;;
+			functionCalls.push_back(functions.find(name)->second);
+		}
+
+	}
 
 
+	return functionCalls;
 
+}
+
+void FunctionOrder::orderFunctions() {
+	vector<func_ptr> sorted = g.topologicalSort();
+	for(int  i = 0; i< sorted.size();i++){
+		cout<<sorted[i]->getDeclaration()<<endl;;
+	}
+}

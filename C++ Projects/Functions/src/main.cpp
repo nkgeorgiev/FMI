@@ -1,49 +1,47 @@
 #include <iostream>
 #include <regex>
 #include "FunctionOrder.h"
-#include "Graph.cpp"
 using namespace std;
-
-
-
 
 void testFunction() {
 	string func = "void foo(int a, int b){int b; cout<<a+b<<endl;";
 	Function f(func);
 	cout << f.getName() << endl;
-	cout << f.getRetType() << endl;
-	;
-	vector<string> a = f.getArgs();
-	vector<string> b = f.getArgsType();
-	for (int i = 0; i < a.size(); i++) {
-		cout << a[i] << ' ' << b[i] << endl;
-	}
+	cout<<f.getDeclaration();
 }
 
-void testFunctionOrder(){
+void testFunctionOrder() {
 	FunctionOrder fo("test.cpp");
+	fo.orderFunctions();
+}
+
+void testGraph() {
+
+	Graph<int> a;
+	a.add_edge(3, 8);
+	a.add_edge(3, 10);
+	a.add_edge(5, 11);
+	a.add_edge(7, 8);
+	a.add_edge(7, 11);
+	a.add_edge(8, 9);
+	a.add_edge(11, 2);
+	a.add_edge(11, 9);
+	a.add_edge(11, 10);
+
+
+	a.print();
+	cout << "-------------------\n";
+	vector<int> sorted = a.topologicalSort();
+	for (int i = 0; i < sorted.size(); i++)
+		cout << sorted[i] << ' ';
+	cout << endl;
+
+	cout << "asbds";
 }
 
 int main() {
-	//testFunctionOrder();
-	Graph<int> a;
-	a.add_Edge(3,4);
-	a.add_Edge(10,4);
-	a.add_Edge(10,3);
-	//a.remove_edge(10,3);
-	a.add_Edge(4, 3);
-	a.add_Edge(4,10);
-//	a.remove_edge(3,4);
-//	a.remove_edge(10,4);
-	a.print();
-//	//a.remove_cycles();
-	cout<<"-------------------\n";
-	a.print();
-	vector<int> sorted = a.topologicalSort();
-	for(int i = 0; i< sorted.size(); i++)
-		cout<<sorted[i]<<' ';
-	cout<<endl;
+	testFunctionOrder();
+	//testGraph();
 
-	cout<<"asbds";
 	return 0;
 }

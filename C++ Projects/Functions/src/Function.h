@@ -23,9 +23,7 @@ vector<string> split(string s, string delim);
 class Function {
 private:
 	string name;
-	string ret_type;
-	vector<string> args_type;
-	vector<string> args;
+	string declaration;
 	string contents;
 
 
@@ -34,13 +32,13 @@ private:
 public:
 	Function(string);
 
-	const vector<string>& getArgs() const {
-		return args;
-	}
-
-	const vector<string>& getArgsType() const {
-		return args_type;
-	}
+//	const vector<string>& getArgs() const {
+//		return args;
+//	}
+//
+//	const vector<string>& getArgsType() const {
+//		return args_type;
+//	}
 
 
 
@@ -48,11 +46,19 @@ public:
 		return name;
 	}
 
-	const string& getRetType() const {
-		return ret_type;
-	}
+//	const string& getRetType() const {
+//		return ret_type;
+//	}
 
 	void prettyPrint(ostream &)const;
+
+	const string& getContents() const {
+		return contents;
+	}
+
+	const string& getDeclaration() const{
+		return declaration;
+	}
 };
 
 #endif /* FUNCTION_H_ */

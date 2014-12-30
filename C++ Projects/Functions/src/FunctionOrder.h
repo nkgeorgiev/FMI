@@ -11,23 +11,25 @@
 #include <fstream>
 #include <regex>
 
-
+#include "Graph.cpp"
 #include "Function.h"
 
+typedef shared_ptr<Function> func_ptr;
 
 class FunctionOrder {
-	map<string, shared_ptr<Function> > functions;
+	map<string, func_ptr> functions;
 	string text;
-	map<int, shared_ptr<Function> > mapping;;
-	vector<vector<int> > graph;
+	vector<string> file;
+	Graph<func_ptr> g;
 
 	string getFunctionText(string);
 	void loadFile(string);
 
-	vector<shared_ptr<Function> > findFunctionCalls(string);
+	vector<func_ptr> findFunctionCalls(func_ptr);
 public:
 
 	FunctionOrder(string);
+	void orderFunctions();
 
 };
 

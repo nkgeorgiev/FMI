@@ -91,7 +91,7 @@ private:
 public:
 	Graph() : idx(0) {
 	}
-	void add_Edge(T f, T s) {
+	void add_edge(T f, T s) {
 		if (mapping.find(f) == mapping.end()) {
 			reverse_mapping[idx] = f;
 			mapping[f] = idx++;
@@ -112,6 +112,7 @@ public:
 	vector<T> topologicalSort() {
 		Graph g(*this);
 		g.remove_cycles();
+		g.print();
 		vector<T> sorted;
 		queue<int> S;
 		for (int i = 0; i < g.matrix.size(); i++)
@@ -124,13 +125,11 @@ public:
 			sorted.push_back(reverse_mapping[node]);
 			vector<int> n = g.neighbours(node);
 			for (int i = 0; i < n.size(); i++) {
-				g.remove_edge(reverse_mapping[node], reverse_mapping[i]);
-				if (!g.has_incoming_edges(i))
-					S.push(i);
+				g.remove_edge(reverse_mapping[node], reverse_mapping[n[i]]);
+				if (!g.has_incoming_edges(n[i]))
+					S.push(n[i]);
 			}
 		}
-		return sorted;
-
 		return sorted;
 	}
 
