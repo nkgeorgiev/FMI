@@ -14,8 +14,6 @@
 
 using namespace std;
 
-
-
 template<typename T>
 class Graph {
 private:
@@ -75,24 +73,23 @@ private:
 		/*
 		 * МЕТОДА ТРИЕ ВЪРХОВЕ!!!
 		 */
-			for(int i = 0; i < matrix.size();i++){
-				if(has_cycle(i)){
-					for(int j = 0; j < matrix[i].size(); j++)
-						matrix[i][j] = false;
-				}
+		for (int i = 0; i < matrix.size(); i++) {
+			if (has_cycle(i)) {
+				for (int j = 0; j < matrix[i].size(); j++)
+					matrix[i][j] = false;
 			}
 		}
+	}
 
-	bool has_incoming_edges(int v){
-		for(int i =0; i <matrix[v].size(); i++)
-			if(matrix[i][v] == true) return true;
+	bool has_incoming_edges(int v) {
+		for (int i = 0; i < matrix[v].size(); i++)
+			if (matrix[i][v] == true)
+				return true;
 		return false;
 	}
 
 public:
-	Graph() :
-			idx(0) {
-		//matrix.resize(10, vector<bool>(10, false));
+	Graph() : idx(0) {
 	}
 	void add_Edge(T f, T s) {
 		if (mapping.find(f) == mapping.end()) {
@@ -112,38 +109,30 @@ public:
 		int i = mapping[f], j = mapping[s];
 		matrix[i][j] = false;
 	}
-	vector<T> topologicalSort(){
+	vector<T> topologicalSort() {
 		Graph g(*this);
 		g.remove_cycles();
 		vector<T> sorted;
 		queue<int> S;
-		for(int i = 0; i < g.matrix.size(); i++)
-			if(!g.has_incoming_edges(i))
+		for (int i = 0; i < g.matrix.size(); i++)
+			if (!g.has_incoming_edges(i))
 				S.push(i);
 
-		while(!S.empty()){
+		while (!S.empty()) {
 			int node = S.front();
 			S.pop();
 			sorted.push_back(reverse_mapping[node]);
 			vector<int> n = g.neighbours(node);
-			for(int i = 0; i < n.size(); i++){
+			for (int i = 0; i < n.size(); i++) {
 				g.remove_edge(reverse_mapping[node], reverse_mapping[i]);
-				if(!g.has_incoming_edges(i))
+				if (!g.has_incoming_edges(i))
 					S.push(i);
 			}
 		}
 		return sorted;
 
-
-
-
-
-
-
-
 		return sorted;
 	}
-
 
 	void print() {
 		for (int i = 0; i < matrix.size(); i++) {
