@@ -6,16 +6,19 @@
 CPP_SRCS += \
 ../src/Function.cpp \
 ../src/FunctionOrder.cpp \
+../src/Graph.cpp \
 ../src/main.cpp 
 
 OBJS += \
 ./src/Function.o \
 ./src/FunctionOrder.o \
+./src/Graph.o \
 ./src/main.o 
 
 CPP_DEPS += \
 ./src/Function.d \
 ./src/FunctionOrder.d \
+./src/Graph.d \
 ./src/main.d 
 
 

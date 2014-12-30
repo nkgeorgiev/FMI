@@ -18,13 +18,16 @@
 class FunctionOrder {
 	map<string, shared_ptr<Function> > functions;
 	string text;
-	//vector<string> contents;
+	map<int, shared_ptr<Function> > mapping;;
+	vector<vector<int> > graph;
 
 	string getFunctionText(string);
 	void loadFile(string);
+
+	vector<shared_ptr<Function> > findFunctionCalls(string);
 public:
+
 	FunctionOrder(string);
-	~FunctionOrder();
 
 };
 

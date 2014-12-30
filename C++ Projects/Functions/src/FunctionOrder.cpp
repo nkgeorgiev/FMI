@@ -116,20 +116,17 @@ void tmp() {
 FunctionOrder::FunctionOrder(string filename) {
 	loadFile(filename);
 	string t = getFunctionText(text);
+	int i = 0;
 	while(!t.empty()){
-		Function* f =  new Function(t);
-		f->prettyPrint(cout);
-		functions[f->getName()] = shared_ptr<Function>(f);
+		shared_ptr<Function>  f = shared_ptr<Function>(new Function(t));
+		//f->prettyPrint(cout);
+		functions[f->getName()] = f;
+		mapping[i++] = f;
 		t = getFunctionText(text.substr(text.find(t)+t.size()));
 	}
-
+	functions["foo"]->prettyPrint(cout);
 }
 
-FunctionOrder::~FunctionOrder(){
-//	while(!functions.empty()){
-//		Function* tmp = functions.back();
-//		delete tmp;
-//		functions.pop_back();
-//	}
 
-}
+
+
