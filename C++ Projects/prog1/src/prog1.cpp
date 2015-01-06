@@ -41,13 +41,7 @@ void prog1(){
 			stream.push_back(deque<int>(1,*it));
 		}
 	}
-	for(int i = 0; i < stream.size(); i++){
-		for(int j = 0; j < stream[i].size(); j++){
-			cout<<stream[i][j]<<' ';
-		}
-		cout<<endl;
-	}
-
+	//next iterations
 	bool change = false;
 	do{
 		change  = false;
@@ -57,7 +51,6 @@ void prog1(){
 				if(stream[i].back()< stream[j].front()){
 					stream[j].insert(stream[j].begin(), stream[i].begin(), stream[i].end());
 					change = true;
-					//i--;
 					stream.erase(stream.begin()+i);
 				}
 			}
@@ -67,6 +60,7 @@ void prog1(){
 	} while(change);
 
 	for(int i = 0; i < stream.size(); i++){
+		cout<<"Купчина "<< i+1<<": ";
 			for(int j = 0; j < stream[i].size(); j++){
 				cout<<stream[i][j]<<' ';
 			}
@@ -74,7 +68,6 @@ void prog1(){
 		}
 }
 int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 	prog1();
 	return 0;
 }
