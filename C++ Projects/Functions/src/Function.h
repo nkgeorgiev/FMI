@@ -25,12 +25,14 @@ private:
 	string name;
 	string declaration;
 	string contents;
+	int start,end;
 
 
 
 	void readFunction(string);
 public:
 	Function(string);
+	Function(vector<string>, int, int);
 
 //	const vector<string>& getArgs() const {
 //		return args;
@@ -58,6 +60,14 @@ public:
 
 	const string& getDeclaration() const{
 		return declaration;
+	}
+
+	int getEnd() const {
+		return end;
+	}
+
+	int getStart() const {
+		return start;
 	}
 };
 

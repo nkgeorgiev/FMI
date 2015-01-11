@@ -83,6 +83,10 @@ void prog2(){
 }
 
 int main() {
-	prog2();
+	//prog2();
+	stack<int> s;
+	for(int i = 0; i< 10; i++)
+		s.push(i);
+	cout<<"adsad";
 	return 0;
 }

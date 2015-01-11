@@ -31,8 +31,8 @@ void testGraph() {
 
 	a.print();
 	cout << "-------------------\n";
-	vector<int> sorted = a.topologicalSort();
-	for (int i = 0; i < sorted.size(); i++)
+	vector<int> sorted = a.topologicalSort().second;
+	for (int i = sorted.size()-1; i >=0; i--)
 		cout << sorted[i] << ' ';
 	cout << endl;
 
@@ -45,3 +45,4 @@ int main() {
 
 	return 0;
 }
+

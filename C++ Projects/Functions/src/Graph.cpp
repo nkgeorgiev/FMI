@@ -20,7 +20,7 @@ private:
 	map<T, int> mapping;
 	map<int, T> reverse_mapping;
 	vector<vector<bool> > matrix;
-	int idx;
+	unsigned int idx;
 
 	void resize(int size) {
 		if (idx >= matrix.size()) {
@@ -43,15 +43,14 @@ private:
 		if (v < 0 || v >= matrix.size()) {
 			return false;
 		}
-		//обхождаме графа с DFS и ако срещнем някъв началния връх
-		//значи съществува цикъл
+
 		vector<bool> visited(matrix.size(), false);
 		stack<int> s;
 		visited[v] = true;
 		vector<int> n = neighbours(v);
 		//рекурсия
-//		if(n.size() == 0 && n[0] == v)
-//			return false;
+		//if(n.size() == 1 && n[0] == v)
+		//	return false;
 		for (int i = 0; i < n.size(); i++)
 			s.push(n[i]);
 		while (!s.empty()) {
@@ -63,22 +62,24 @@ private:
 				visited[u] = true;
 				n = neighbours(u);
 				for (int i = 0; i < n.size(); i++)
-					s.push(n[i]);
+					if (!visited[n[i]])
+						s.push(n[i]);
 			}
 		}
 		return false;
 	}
 
-	void remove_cycles() {
-		/*
-		 * МЕТОДА ТРИЕ ВЪРХОВЕ!!!
-		 */
+	vector<T> remove_cycles() {
+
+		vector<T> declarations(1);
 		for (int i = 0; i < matrix.size(); i++) {
 			if (has_cycle(i)) {
+				declarations.push_back(reverse_mapping[i]);
 				for (int j = 0; j < matrix[i].size(); j++)
 					matrix[i][j] = false;
 			}
 		}
+		return declarations;
 	}
 
 	bool has_incoming_edges(int v) {
@@ -89,8 +90,20 @@ private:
 	}
 
 public:
-	Graph() : idx(0) {
+	Graph() :
+			idx(0) {
 	}
+
+	Graph(const vector<T>& v) :
+			idx(0) {
+		resize(v.size());
+		for (int i = 0; i < v.size(); i++) {
+			reverse_mapping[idx] = v[i];
+			mapping[v[i]] = idx++;
+		}
+	}
+
+	//създаване на ребро между f и s
 	void add_edge(T f, T s) {
 		if (mapping.find(f) == mapping.end()) {
 			reverse_mapping[idx] = f;
@@ -105,15 +118,31 @@ public:
 		matrix[i][j] = true;
 	}
 
+	//триене на ребро между f и s (ако съществува)
 	void remove_edge(T f, T s) {
 		int i = mapping[f], j = mapping[s];
 		matrix[i][j] = false;
 	}
-	vector<T> topologicalSort() {
+
+	pair<vector<T>, vector<T> > topologicalSort() {
 		Graph g(*this);
-		g.remove_cycles();
-		g.print();
+		set<int> vertices;
+		for (int i = 0; i < matrix.size(); i++) {
+			vertices.insert(i);
+		}
+
+//		for (int i = 0; i < g.matrix.size(); i++) {
+//			for (int j = 0; j < g.matrix[i].size(); j++) {
+//				if (g.matrix[i][j] == true) {
+//					sorted.push_back(reverse_mapping[i]);
+//					break;
+//				}
+//			}
+//		}
+		vector<T> declarations = g.remove_cycles();
+		//vector<T> sorted(declarations.begin(), declarations.end());
 		vector<T> sorted;
+		//g.print();
 		queue<int> S;
 		for (int i = 0; i < g.matrix.size(); i++)
 			if (!g.has_incoming_edges(i))
@@ -123,14 +152,24 @@ public:
 			int node = S.front();
 			S.pop();
 			sorted.push_back(reverse_mapping[node]);
+			vertices.erase(node);
 			vector<int> n = g.neighbours(node);
 			for (int i = 0; i < n.size(); i++) {
 				g.remove_edge(reverse_mapping[node], reverse_mapping[n[i]]);
-				if (!g.has_incoming_edges(n[i]))
+				if (!g.has_incoming_edges(n[i])) {
 					S.push(n[i]);
+					//vertices.insert(n[i]);
+				}
 			}
 		}
-		return sorted;
+		set<int>::iterator it = vertices.begin();
+		//sorted.insert(0,*it++);
+		while (it != vertices.end()) {
+			cout << *it << ' ';
+			sorted.insert(sorted.begin(), reverse_mapping[*it]);
+			it++;
+		}
+		return make_pair(declarations, sorted);
 	}
 
 	void print() {

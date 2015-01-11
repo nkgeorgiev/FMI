@@ -18,11 +18,12 @@ typedef shared_ptr<Function> func_ptr;
 
 class FunctionOrder {
 	map<string, func_ptr> functions;
-	string text;
+	int b;
 	vector<string> file;
 	Graph<func_ptr> g;
+	string filename;
 
-	string getFunctionText(string);
+	pair<int, int> getFunctionText(vector<string>, int, int);
 	void loadFile(string);
 
 	vector<func_ptr> findFunctionCalls(func_ptr);

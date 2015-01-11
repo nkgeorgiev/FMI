@@ -25,7 +25,6 @@ vector<string> split(string s, string delim) {
 }
 
 void Function::readFunction(string text) {
-	//text - сигнатурата - type name(args)
 	int first_bracket = text.find('(');
 	int second_bracket = text.find(')');
 	string first = text.substr(0, first_bracket);
@@ -57,6 +56,16 @@ Function::Function(string text) {
 	readFunction(text);
 	contents = text;
 
+}
+
+Function::Function(vector<string> v, int s, int e) {
+	start = s;
+	end = e;
+	string text;
+	for(int i = s; i <= e; i++)
+		text +=v[i];
+	readFunction(text);
+	contents = text;
 }
 
 void Function::prettyPrint(ostream & os) const {
