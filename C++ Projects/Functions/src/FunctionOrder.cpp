@@ -140,8 +140,6 @@ vector<func_ptr> FunctionOrder::findFunctionCalls(func_ptr f) {
 		while (text[--idx1] == ' ') {
 		}
 		string name = text.substr(0, idx1 + 1);
-		int a = name.find_last_of(" ;}") + 1;
-		int b = name.find_last_of("\s") + 1;
 		name = name.substr(name.find_last_of(" ;}\t\n,") + 1);
 		//cout<<name<<endl;
 		text = text.substr(idx2 + 1);
@@ -161,19 +159,24 @@ vector<func_ptr> FunctionOrder::findFunctionCalls(func_ptr f) {
 }
 
 void FunctionOrder::orderFunctions() {
+	ofstream ofs(filename+".new", ofstream::out);
 	for (int i = 0; i < b; i++) {
-		cout << file[i] << endl;
+		ofs << file[i] << endl;
 	}
-	vector<func_ptr> declarations = g.topologicalSort().first;
-	vector<func_ptr> sorted = g.topologicalSort().second;
+	pair<vector<func_ptr>, vector<func_ptr> > vectors = g.topologicalSort();
+	vector<func_ptr> declarations = vectors.first;
+	//cout<<declarations.size();
+	vector<func_ptr> sorted = vectors.second;
 	for (int i = 0; i < declarations.size(); i++) {
-		cout << sorted[i]->getDeclaration() << ';' << endl;
+		//cout<<i<<endl;
+		ofs << sorted[i]->getDeclaration()<<";\n";
 	}
-	cout << "pff" << endl;
+	ofs << endl;
 	for (int i = sorted.size() - 1; i >= 0; i--) {
 		for (int j = sorted[i]->getStart(); j <= sorted[i]->getEnd(); j++)
-			cout << file[j] << endl;
-		cout<<endl;
+			ofs << file[j] << endl;
+		ofs<<endl;
 	}
-	cout << "ti eba maikata!!!" << endl;
+
+	ofs.close();
 }

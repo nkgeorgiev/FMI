@@ -142,7 +142,6 @@ public:
 		vector<T> declarations = g.remove_cycles();
 		//vector<T> sorted(declarations.begin(), declarations.end());
 		vector<T> sorted;
-		//g.print();
 		queue<int> S;
 		for (int i = 0; i < g.matrix.size(); i++)
 			if (!g.has_incoming_edges(i))
@@ -162,13 +161,14 @@ public:
 				}
 			}
 		}
+		//g.print();
 		set<int>::iterator it = vertices.begin();
 		//sorted.insert(0,*it++);
 		while (it != vertices.end()) {
-			cout << *it << ' ';
 			sorted.insert(sorted.begin(), reverse_mapping[*it]);
 			it++;
 		}
+
 		return make_pair(declarations, sorted);
 	}
 

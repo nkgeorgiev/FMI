@@ -32,15 +32,8 @@ private:
 	void readFunction(string);
 public:
 	Function(string);
-	Function(vector<string>, int, int);
 
-//	const vector<string>& getArgs() const {
-//		return args;
-//	}
-//
-//	const vector<string>& getArgsType() const {
-//		return args_type;
-//	}
+	Function(vector<string>, int, int);
 
 
 
@@ -48,9 +41,6 @@ public:
 		return name;
 	}
 
-//	const string& getRetType() const {
-//		return ret_type;
-//	}
 
 	void prettyPrint(ostream &)const;
 
