@@ -42,8 +42,6 @@ public:
 	}
 
 
-	void prettyPrint(ostream &)const;
-
 	const string& getContents() const {
 		return contents;
 	}

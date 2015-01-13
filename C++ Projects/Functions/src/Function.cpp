@@ -39,16 +39,6 @@ void Function::readFunction(string text) {
 		;
 	this->name = first.substr(start_idx + 2, end_idx - start_idx);
 	this->declaration = text.substr(0, second_bracket+1);
-//	this->ret_type = first.substr(0, start_idx + 1);
-//
-//	start_idx = first.size() + 2;
-//	end_idx = second.size() - 1;
-//	vector<string> arg = split(second, ",");
-//	for (int i = 0; i < arg.size(); i++) {
-//		vector<string> v = split(arg[i], " ");
-//		args_type.push_back(v[0]);
-//		args.push_back(v[1]);
-//	}
 
 }
 
@@ -68,34 +58,4 @@ Function::Function(vector<string> v, int s, int e) {
 	contents = text;
 }
 
-void Function::prettyPrint(ostream & os) const {
-	vector<string> tmp;
-	string c = contents;
-	int tabs = 0;
-	int start = 0;
-	for (int i = 0; i < contents.size(); i++) {
-		string c;
-		for (int i = 0; i < tabs; i++)
-			c += "\t";
-		if (contents[i] == '{') {
-			tabs++;
-			tmp.push_back(c + contents.substr(start, i - start + 1));
-			start = i + 1;
-		} else if (contents[i] == ';') {
-			string s = contents.substr(start, i - start + 1);
-			tmp.push_back(c + s);
-			start = i+1;
-		} else if (contents[i] == '}') {
-			tabs--;
-
-			tmp.push_back(c.substr(0,c.size()-1) + "}");
-			start = i + 1;
-		}
-
-	}
-
-	for (int i = 0; i < tmp.size(); i++)
-		os << tmp[i] << endl;
-
-}
 

@@ -1,11 +1,11 @@
 /*
- * Graph.cpp
+ * TownMap.cpp
  *
  *  Created on: Dec 21, 2014
  *      Author: nikolay
  */
 
-#include "Graph.h"
+#include "TownMap.h"
 
 bool isIn(int x, vector<int> v) {
 	for (int i = 0; i < v.size(); i++) {
@@ -23,7 +23,7 @@ bool allSame(T x, vector<T> v) {
 	return true;
 }
 
-vector<string> Graph::split(string s, string delim) {
+vector<string> split(string s, string delim) {
 	vector<string> tokens;
 	int start = 0;
 	int end = s.find(delim);
@@ -40,7 +40,7 @@ vector<string> Graph::split(string s, string delim) {
 
 }
 
-int Graph::minDist(set<int> s, vector<int> dist) {
+int TownMap::minDist(set<int> s, vector<int> dist) {
 	set<int>::iterator iter = s.begin();
 	int m = *iter;
 	for (; iter != s.end(); iter++) {
@@ -50,7 +50,7 @@ int Graph::minDist(set<int> s, vector<int> dist) {
 	return m;
 }
 
-vector<int> Graph::neighbours(int v) {
+vector<int> TownMap::neighbours(int v) {
 	vector<int> n;
 	for (int i = 0; i < adjList[v].size(); i++) {
 		if (adjList[v][i] > 0)
@@ -60,16 +60,16 @@ vector<int> Graph::neighbours(int v) {
 	return n;
 }
 
-Graph::Graph(string name) {
-	loadGraph(name);
+TownMap::TownMap(string name) {
+	loadTownMap(name);
 
 }
 
-Graph::Graph(vector<vector<int> > l) {
+TownMap::TownMap(vector<vector<int> > l) {
 	adjList = l;
 }
 
-void Graph::loadGraph(string name) {
+void TownMap::loadTownMap(string name) {
 	ifstream ifs(name.c_str());
 	string line;
 	//i - first vertex
@@ -98,7 +98,7 @@ void Graph::loadGraph(string name) {
 	}
 }
 
-vector<int> Graph::shortestPath(int begin, int end) {
+vector<int> TownMap::shortestPath(int begin, int end) {
 	/*
 	 * begin - начален връх
 	 * end - краен връх
@@ -144,7 +144,7 @@ vector<int> Graph::shortestPath(int begin, int end) {
 
 }
 
-int Graph::deadends() {
+int TownMap::deadends() {
 	int cnt = 0;
 	for (int i = 1; i < adjList.size(); i++) {
 		if (allSame(0, adjList[i]))
@@ -153,7 +153,7 @@ int Graph::deadends() {
 	return cnt;
 }
 
-bool Graph::pathExists(int v, int u) {
+bool TownMap::pathExists(int v, int u) {
 	/*
 	 * v - начален връх
 	 * u - краен връх
@@ -162,7 +162,7 @@ bool Graph::pathExists(int v, int u) {
 	return shortestPath(v, u).size() != 0;
 }
 
-bool Graph::containsCycle(int v) {
+bool TownMap::containsCycle(int v) {
 	if (v <= 0 || v >= adjList.size()) {
 		return false;
 	}
@@ -189,7 +189,7 @@ bool Graph::containsCycle(int v) {
 	return false;
 }
 
-void Graph::DFSEuler(int start, int v, set<pair<int, int> >& s,
+void TownMap::DFSEuler(int start, int v, set<pair<int, int> >& s,
 		vector<int>& q) {
 	if (s.empty() && start != v) {
 		//q.pop_back();
@@ -210,7 +210,7 @@ void Graph::DFSEuler(int start, int v, set<pair<int, int> >& s,
 
 }
 
-vector<int> Graph::eulerianCircuit() {
+vector<int> TownMap::eulerianCircuit() {
 	set<pair<int, int> > edges;
 	//пресмятаме броя на входящите и изходящите съседи
 	vector<int> outgoing(adjList.size(), 0);
@@ -236,7 +236,7 @@ vector<int> Graph::eulerianCircuit() {
 
 }
 
-void Graph::printGraph() {
+void TownMap::printTownMap() {
 	for (int i = 1; i < adjList.size(); i++) {
 		if (adjList[i].size() > 0) {
 			cout << "Vertex: " << i << " - ";
@@ -247,7 +247,7 @@ void Graph::printGraph() {
 	}
 }
 
-vector<int> Graph::alternativeRoutes(int v, int u, vector<int> unavailable) {
+vector<int> TownMap::alternativeRoutes(int v, int u, vector<int> unavailable) {
 	/*
 	 * v - връх от който тръгваме
 	 * u - връх в който пристигаме
@@ -260,7 +260,7 @@ vector<int> Graph::alternativeRoutes(int v, int u, vector<int> unavailable) {
 		} else
 			new_list.push_back(vector<int>(2, 0));
 	}
-	return Graph(new_list).shortestPath(v, u);
+	return TownMap(new_list).shortestPath(v, u);
 	//return vector<int> ();
 }
 

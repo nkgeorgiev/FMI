@@ -27,12 +27,7 @@ pair<int, int> FunctionOrder::getFunctionText(vector<string> v, int start,
 			}
 		}
 	}
-	//cout<<t.substr(0,s+1)<<endl;
-//	vector<string> tmp(v.begin()+f, v.begin() + s);
-//	string text;
-//	for(int i = 0; i < tmp.size(); i++)
-//		text += tmp[i];
-//	return text;
+
 	return make_pair(-1, -1);
 }
 
@@ -43,59 +38,7 @@ void FunctionOrder::loadFile(string filename) {
 	while (!ifs.eof()) {
 		getline(ifs, line);
 		file.push_back(line);
-
-		//int i = 0;
-		if (line[0] != '#' && line.find("using") == string::npos) {
-			int idx = line.find("//");
-//			if (idx == string::npos)
-//				text += line;
-//			else
-//				text += line.substr(0, idx);
-		}
-		i++;
 	}
-
-//	regex rx("(\\s)*;(\\s)*");
-//	regex rx2("(\\s)*,(\\s)*");
-//	regex rx3("(\\s)+");
-//	regex rx4("/\*.*\*/");
-//	//махаме интервалите покрай ';'
-//	text = regex_replace(text, rx, string("; "));
-//	//махаме интервалите покрай ,
-//	text = regex_replace(text, rx2, string(", "));
-//	//намаляме интервалите до 1
-//	text = regex_replace(text, rx3, string(" "));
-//	//махаме коментари
-//	text = regex_replace(text, rx4, string(""));
-
-//cout<<text<<endl;;
-//contents = split(text, ";");
-//	vector<string> tmp = split(text, ";");
-//	for (int i = 0; i < tmp.size(); i++) {
-//		//cout << tmp[i] << endl;
-//		int idx1 = tmp[i].find("{");
-//		int idx2 = tmp[i].rfind("}");
-//		if (idx1 != string::npos) {
-//			//contents.push_back(tmp[i].substr(0, idx1+1));
-//			if (idx2 > idx1) {
-//				contents.push_back(tmp[i].substr(idx1, idx2 - idx1 - 1));
-//				contents.push_back(tmp[i].substr(idx2,1));
-//
-//				contents.push_back(tmp[i].substr(idx2+1));
-//			}
-//			else if (idx2 != string::npos){
-//				contents.push_back(tmp[i].substr(idx2,1));
-//						contents.push_back(tmp[i].substr(idx2+1));
-//			}else
-//				contents.push_back(tmp[i].substr(0,idx1+1)+";");
-//		}
-//		else
-//			contents.push_back(tmp[i] + ";");
-//	}
-////
-//	for(int i = 0; i < contents.size();i++)
-//		cout<<contents[i]<<endl;
-
 }
 
 FunctionOrder::FunctionOrder(string filename) {
@@ -105,7 +48,6 @@ FunctionOrder::FunctionOrder(string filename) {
 	b = t.first;
 	while (t.first >= 0) {
 		func_ptr f = func_ptr(new Function(file, t.first, t.second));
-		//f->prettyPrint(cout);
 		string key = f->getName();
 		functions[key] = f;
 		t = getFunctionText(file, t.second + 1, file.size());
@@ -120,10 +62,8 @@ FunctionOrder::FunctionOrder(string filename) {
 
 	it = functions.begin();
 	for (; it != functions.end(); it++) {
-		//it->second->prettyPrint(cout);
 		vector<func_ptr> func_calls = findFunctionCalls(it->second);
 		for (int i = 0; i < func_calls.size(); i++) {
-			//if (it->second == func_calls[i])
 				g.add_edge(it->second, func_calls[i]);
 		}
 	}
@@ -141,14 +81,11 @@ vector<func_ptr> FunctionOrder::findFunctionCalls(func_ptr f) {
 		}
 		string name = text.substr(0, idx1 + 1);
 		name = name.substr(name.find_last_of(" ;}\t\n,") + 1);
-		//cout<<name<<endl;
 		text = text.substr(idx2 + 1);
 		idx1 = text.find('(');
 		idx2 = text.find(')');
-		//cout<<name<<endl;
 
 		if (functions.find(name) != functions.end()) {
-			//if (functions.find(name)->second != f)
 			functionCalls.push_back(functions.find(name)->second);
 		}
 
@@ -159,16 +96,13 @@ vector<func_ptr> FunctionOrder::findFunctionCalls(func_ptr f) {
 }
 
 void FunctionOrder::orderFunctions() {
-	ofstream ofs(filename+".new", ofstream::out);
+	ofstream ofs("new."+filename, ofstream::out);
 	for (int i = 0; i < b; i++) {
 		ofs << file[i] << endl;
 	}
-	pair<vector<func_ptr>, vector<func_ptr> > vectors = g.topologicalSort();
-	vector<func_ptr> declarations = vectors.first;
-	//cout<<declarations.size();
-	vector<func_ptr> sorted = vectors.second;
+	vector<func_ptr> declarations = g.remove_cycles();
+	vector<func_ptr> sorted = g.topologicalSort();
 	for (int i = 0; i < declarations.size(); i++) {
-		//cout<<i<<endl;
 		ofs << sorted[i]->getDeclaration()<<";\n";
 	}
 	ofs << endl;

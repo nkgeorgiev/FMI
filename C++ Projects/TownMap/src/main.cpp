@@ -7,12 +7,13 @@
 //============================================================================
 
 #include <iostream>
-#include "Graph.h"
+
+#include "TownMap.h"
 using namespace std;
 
 int main() {
-	Graph g("file3.txt");
-	g.printGraph();
+	TownMap g("file3.txt");
+	g.printTownMap();
 	cout << "number of deadends: " << g.deadends() << endl;
 	vector<int> v = g.shortestPath(1, 6);
 	vector<int> a(1, 4);

@@ -4,15 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/Graph.cpp \
+../src/TownMap.cpp \
 ../src/main.cpp 
 
 OBJS += \
-./src/Graph.o \
+./src/TownMap.o \
 ./src/main.o 
 
 CPP_DEPS += \
-./src/Graph.d \
+./src/TownMap.d \
 ./src/main.d 
 
 

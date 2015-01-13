@@ -5,8 +5,8 @@
  *      Author: nikolay
  */
 
-#ifndef GRAPH_H_
-#define GRAPH_H_
+#ifndef TOWNMAP_SRC_GRAPH_H_
+#define TOWNMAP_SRC_GRAPH_H_
 
 #include <vector>
 #include <string>
@@ -20,22 +20,23 @@
 #include <algorithm>
 using namespace std;
 
-class Graph {
+class TownMap {
 private:
 	vector<vector<int> > adjList;
 	// чете граф от файл
-	void loadGraph(string);
+	void loadTownMap(string);
 
-	vector<string> split(string, string);
-	vector<int> neighbours(int);
 	int minDist(set<int>, vector<int>);
 	void DFSEuler(int, int, set<pair<int, int> >&, vector<int>&);
 public:
 	//конструктор с параметър име на файл
-	Graph(string);
+	TownMap(string);
 
 	//конструктор с параметър списък на съседство
-	Graph(vector<vector<int> >);
+	TownMap(vector<vector<int> >);
+
+	//връща съседите на даден връх
+	vector<int> neighbours(int);
 
 	//намира най къс път между 2 върха
 	vector<int> shortestPath(int, int);
@@ -55,9 +56,9 @@ public:
 	//намира най-къс алтернативен маршрут
 	vector<int> alternativeRoutes(int, int, vector<int>);
 
-	//извежда списъка на съседство
-	void printGraph();
+	//принтира графа
+	void printTownMap();
 
 };
 
-#endif /* GRAPH_H_ */
+#endif /* TOWNMAP_SRC_GRAPH_H_ */
