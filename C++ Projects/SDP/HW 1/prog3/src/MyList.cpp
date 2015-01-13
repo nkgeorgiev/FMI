@@ -1,10 +1,3 @@
-/*
- * MyList.cpp
- *
- *  Created on: Jan 12, 2015
- *      Author: nikolay
- */
-
 #include "MyList.h"
 
 void MyList::join(MyList& second) {
@@ -43,12 +36,9 @@ void MyList::join(MyList& second) {
 		second.front->prev = first_tmp;
 		while(second.front->prev != NULL)
 			second.front = second.front->prev;
-		joined = &second;
-		second.joined = this;
 		cout << "Joined at:" << max << endl;
 
 	}
-	//second.join(*this);
 
 }
 
