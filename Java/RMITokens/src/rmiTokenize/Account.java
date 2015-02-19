@@ -20,9 +20,6 @@ public class Account {
         this.rights = rights;
     }
     
-    public Account(){
-        this("admin","admin",2);
-    }
 
     public String getUsername() {
         return username;

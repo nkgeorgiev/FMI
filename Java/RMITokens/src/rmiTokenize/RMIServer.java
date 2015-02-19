@@ -5,7 +5,6 @@
  */
 package rmiTokenize;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import java.io.EOFException;
@@ -31,9 +30,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import sun.rmi.runtime.Log;
 
 /**
  *
@@ -41,94 +37,98 @@ import sun.rmi.runtime.Log;
  */
 public class RMIServer extends UnicastRemoteObject implements ServerInterface {
 
-    //k: tokens v: bank number
-    private final HashSet<Account> accounts;
+    private static final String accFileName = "accounts.xml";
+    private static final String tokenFileName = "tokens.xml";
+    private static final Random random = new Random();
     private final XStream xstream = new XStream(new StaxDriver());
 
+    private final HashSet<Account> accounts;
+    //k : token v: card number
     private final SortedMap<String, String> tokens;
-    private static final Random random = new Random();
 
     public RMIServer() throws RemoteException {
         super();
         tokens = new TreeMap<>();
         accounts = new HashSet<>();
+        loadAccounts(accFileName);
+        loadTokens(tokenFileName);
 
     }
 
-    public RMIServer(String AccFile, String tokenFile) throws RemoteException {
-        super();
-        tokens = new TreeMap<>();
-        accounts = new HashSet<>();
-        loadAccounts(AccFile);
-        loadTokens(tokenFile);
-
-
-    }
-
-    public RMIServer(String AccFile, String tokenFile, int port) throws RemoteException {
+    public RMIServer(int port) throws RemoteException {
         super(port);
         tokens = new TreeMap<>();
         accounts = new HashSet<>();
-        loadAccounts(AccFile);
-        loadTokens(tokenFile);
+        loadAccounts(accFileName);
+        loadTokens(tokenFileName);
 
     }
 
     @Override
-    public String tokenize(String number) throws RemoteException {
+    public String tokenize(String number) throws RemoteException, InvallidTokenException {
+        //remove all whitespaces
         number = number.replaceAll("[\\s]", "");
         if (!isCorrect(number) || tokens.containsKey(number)) {
-            System.out.println("gyz");
-            return null;
+            throw new InvallidTokenException();
         }
-        String token = "";
-        //tokens.put(text, text);
-        System.out.println(number);
+        //create a list with the digits 0-9
         ArrayList<Character> digits = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             digits.add((char) ('0' + i));
-            //System.out.println(digits.get(i));
         }
+        
+        String token = "";
         int sum;
         do {
             StringBuilder sb = new StringBuilder();
             sum = 0;
+            //get the first digit of the token
+            // remove 3,4,5,6 from digits and get a random digit from the others 
             digits.removeIf(ch -> ch == '3' || ch == '4' || ch == '5' || ch == '6');
             int i = random.nextInt(digits.size());
             sb.append(digits.get(i) - '0');
             sum += (char) digits.get(i) - '0';
+            //add 3,4,5,6 to digits to make the list whole 
             digits.add('3');
             digits.add('4');
             digits.add('5');
             digits.add('6');
+            //get 2nd to 12th digits of the token
             for (int idx = 1; idx < 12; idx++) {
-
+                //remove from digits the digit at place idx in the card number
                 digits.remove((Character) number.charAt(idx));
+                //get a random digit from the remaining digits
                 i = random.nextInt(digits.size());
                 sb.append((char) digits.get(i) - '0');
                 sum += digits.get(i) - '0';
+                //add the missing digit
                 digits.add(number.charAt(idx));
             }
+            //get the last 4 digits of the token
             for (int idx = 12; idx < 16; idx++) {
                 sb.append(number.charAt(idx));
             }
             token = sb.toString();
         } while (tokens.keySet().contains(token) && sum % 10 != 0);
         tokens.put(token, number);
-        System.out.println(token);
+        saveTokens(tokenFileName);
+
         return token;
     }
 
     @Override
-    public String detokenize(String token) throws RemoteException {
-        //todo
-        return tokens.get(token);
+    public String detokenize(String token) throws RemoteException, InvallidTokenException {
+        token = token.replace("[\\s]", "");
+        if(tokens.keySet().contains(token))
+            return tokens.get(token);
+        throw new InvallidTokenException();
     }
 
     public static Boolean isCorrect(String creditCard) {
         if (creditCard.length() != 16) {
             return false;
         }
+        //convert the string to char[int] with the digits of the number
         char[] d = creditCard.toCharArray();
         int[] digits = new int[d.length];
         for (int i = 0; i < digits.length; i++) {
@@ -138,7 +138,8 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
         if (digits[0] != 3 && digits[0] != 4 && digits[0] != 5 && digits[0] != 6) {
             return false;
         }
-
+        
+        //calculate the Luhn formula 
         int j = 1;
         int sum = 0;
         for (int i = digits.length - 1; i >= 0; i--) {
@@ -146,7 +147,6 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
             if (j % 2 == 0) {
                 digit *= 2;
             }
-
             if (digit > 9) {
                 sum += digit % 10 + 1;
             } else {
@@ -158,6 +158,7 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
     }
 
     private void loadAccounts(String filename) {
+        //read every object from the xml file and add it to the accounts set
         ObjectInputStream in = null;
         try {
             in = xstream.createObjectInputStream(new FileInputStream(filename));
@@ -166,25 +167,27 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
                     Account acc = (Account) in.readObject();
                     accounts.add(acc);
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println("ClassNotFoundException: " + ex);
                 }
             }
 
         } catch (EOFException eof) {
 
         } catch (IOException io) {
-            System.out.println("IOException");
+            System.out.println("IOException" + io);
         } finally {
             try {
                 in.close();
             } catch (IOException ex) {
-                System.out.println("IOException");
+                System.out.println("IOException" + ex);
             }
         }
 
     }
 
     private void saveAccounts(String filename) {
+        //iterate through every account in accounts and write it to the xml file
+        
         ObjectOutputStream out = null;
         try {
             out = xstream.createObjectOutputStream(new FileOutputStream(filename));
@@ -193,18 +196,19 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
                 out.writeObject(iter.next());
             }
         } catch (IOException io) {
-            System.out.println("IOException");
+            System.out.println("IOException" + io);
 
         } finally {
             try {
                 out.close();
             } catch (IOException ex) {
-                System.out.println("IOException");
+                System.out.println("IOException" + ex);
             }
         }
     }
 
     private void loadTokens(String filename) {
+        //read every object from the xml file and add it to tokens map
         ObjectInputStream in = null;
         try {
             in = xstream.createObjectInputStream(new FileInputStream(filename));
@@ -216,21 +220,22 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
                     System.out.println("ClassNotFoundException");
                 }
             }
-
         } catch (EOFException eof) {
 
         } catch (IOException io) {
-            System.out.println("IOException");
+            System.out.println("IOException" + io);
         } finally {
             try {
                 in.close();
             } catch (IOException ex) {
-                System.out.println("IOException");
+                System.out.println("IOException" + ex);
             }
         }
     }
 
     private void saveTokens(String filename) {
+        //iterate through every entry of tokens and write them to the xml file
+
         ObjectOutputStream out = null;
         try {
             out = xstream.createObjectOutputStream(new FileOutputStream(filename));
@@ -252,12 +257,21 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
         }
     }
 
-    public void addAccount(String username, String password, int rights) {
+    @Override
+    public Boolean addAccount(String username, String password, int rights) throws RemoteException {
+        final Account acc = new Account(username, password, rights);
+        //if there exists an account with the same username return false
+        if (!accounts.stream().noneMatch((a) -> (a.getUsername().equals(acc.getUsername())))) {
+            return false;
+        }
         accounts.add(new Account(username, password, rights));
+        saveAccounts(accFileName);
+        return true;
 
     }
 
     @Override
+
     public int login(String username, String password) throws RemoteException {
         Iterator<Account> iter = accounts.iterator();
         while (iter.hasNext()) {
@@ -269,7 +283,8 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
         return 0;
     }
 
-    public void TokensToFile(String file) {
+    @Override
+    public void TokensToFile(String file) throws RemoteException {
         try (Formatter out = new Formatter(file)) {
             Iterator<Map.Entry<String, String>> iter = tokens.entrySet().iterator();
             while (iter.hasNext()) {
@@ -281,7 +296,8 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
         }
     }
 
-    public void NumberstoFile(String file) {
+    @Override
+    public void NumberstoFile(String file) throws RemoteException {
         try (final Formatter out = new Formatter(file)) {
             Set<Map.Entry<String, String>> set = tokens.entrySet();
             set.stream().sorted(Comparator.comparing(entry -> entry.getValue())).forEach(entry -> out.format("%s\t%s\n", entry.getValue(), entry.getKey()));
@@ -292,37 +308,15 @@ public class RMIServer extends UnicastRemoteObject implements ServerInterface {
     }
 
     public static void main(String[] args) throws RemoteException, UnknownHostException {
-//        RMIServer rmi = new RMIServer("accTest.xml", "tokenTest.xml");
-//        rmi.tokenize("3400 0799 2739 8713");
-//        rmi.addAccount("admin", "admin", 3);
-//        rmi.addAccount("nikolay", "pass", 2);
-//        System.out.println(rmi.detokenize("2952562339528713"));
-//        System.out.println(rmi.login("admin", "admin"));
-//        System.out.println(rmi.login("", ""));
-//        rmi.NumberstoFile("test.txt");
-//        //rmi.saveAccounts("accTest.xml");
-//        //rmi.saveTokens("tokenTest.xml");
-//        try {
-//      StudentServerInterface obj = new Student3TierImpl();
-//      Registry registry = LocateRegistry.getRegistry();
-//      registry.rebind("StudentServerInterfaceImpl", obj);
-//      System.out.println("Student server " + obj + " registered");
-//    } catch (Exception ex) {
-//      ex.printStackTrace();
-//    }
-        String hostname = InetAddress.getLocalHost().getHostAddress();
-        System.out.println("this host IP is " + hostname);
-         //System.setProperty("java.rmi.server.hostname", hostname); 
+
         try {
-            ServerInterface obj = new RMIServer("accTest.xml", "tokenTest.xml", 33333);
+            ServerInterface obj = new RMIServer(33333);
             Registry registry = LocateRegistry.createRegistry(33333);
             registry.rebind("rmiServer", obj);
             System.out.println("RMI server " + obj + " registered");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println("Exception: " + ex);
         }
-
-        System.out.println("asdada");
 
     }
 
