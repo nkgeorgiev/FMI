@@ -1,4 +1,4 @@
-MineHunt made with C++ and Qt5.2 on LINUX MINT 16
+A simple minesweeper-like game
 
 Compiling
 ----------
